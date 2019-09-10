@@ -115,7 +115,6 @@ open class View {
 }
 
 class Button : View() {
-
     override fun click() {
         log.probe(5)
         log.info("Button clicked")
