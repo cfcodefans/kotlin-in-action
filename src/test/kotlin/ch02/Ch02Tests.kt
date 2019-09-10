@@ -1,13 +1,12 @@
 package ch02
 
+import ch02.Ch02Tests.Companion.RGB.*
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import ch02.Ch02Tests.Companion.RGB.*
-import ch02.Ch02Tests.Companion.Expr
-import ch02.Ch02Tests.Companion.Num
-import ch02.Ch02Tests.Companion.Sum
-import java.lang.IllegalArgumentException
+import java.io.BufferedReader
+import java.io.StringReader
+import java.util.*
 
 fun max(a: Int, b: Int): Int {
     Ch02Tests.log.info(Thread.currentThread().stackTrace.joinToString("\n\t"))
@@ -114,6 +113,7 @@ class Ch02Tests {
         run {
             log.info(Thread.currentThread().stackTrace.joinToString("\n\t"))
         }
+        log.info(Thread.currentThread().stackTrace.joinToString("\n\t"))
     }
 
     @Test
@@ -207,12 +207,105 @@ class Ch02Tests {
             }
             else -> throw IllegalArgumentException("Unknown expression")
         }
-        log.info(eval_when(
+        log.info(eval_logging(
                 Sum(
                         Sum(Num(4), Num(3)),
                         Num(5))
         ).toString())
     }
 
+    @Test
+    fun testFizzBuzz() {
+        fun fizzBuzz(i: Int) = when {
+            i % 15 == 0 -> "FizzBuzz"
+            i % 3 == 0 -> "Fizz"
+            i % 5 == 0 -> "Buzz"
+            else -> "$i "
+        }
+        for (i in 1..100) {
+            log.info(fizzBuzz(i))
+        }
+
+        for (i in 100 downTo 1 step 2) {
+            log.info(fizzBuzz(i))
+        }
+    }
+
+    @Test
+    fun testIteratingOverMaps() {
+        val binaryReps: TreeMap<Char, String> = TreeMap()
+        for (c in 'A'..'F') {
+            binaryReps[c] = Integer.toBinaryString(c.toInt())
+        }
+        for ((letter, binary) in binaryReps) log.info("$letter = $binary")
+    }
+
+    @Test
+    fun testAnInCheck() {
+        fun isLetter(c: Char) = c in 'a'..'z' || c in 'A'..'Z'
+        fun isNoDigit(c: Char) = c !in '0'..'9'
+
+        log.info("isLetter('1')=${isLetter('1')}")
+        log.info("isNoDigit('1')=${isNoDigit('1')}")
+
+        fun recoginze(c: Char) = when (c) {
+            in '0'..'9' -> "It is digit!"
+            in 'a'..'z', in 'A'..'Z' -> "It is a letter!"
+            else -> "I don't know..."
+        }
+        log.info("recoginze(' ')=${recoginze(' ')}")
+    }
+
+    @Test
+    fun testTryCatchFinally() {
+        fun readNumber(reader: BufferedReader): Int? {
+            try {
+                val line: String = reader.readLine()
+                return Integer.parseInt(line)
+            } catch (e: NumberFormatException) {
+                return null
+            } finally {
+                reader.close()
+            }
+        }
+        log.info("{}", readNumber(BufferedReader(StringReader("239"))))
+    }
+
+    @Test
+    fun testTryCloseable() {
+        val reader = BufferedReader(StringReader("239"))
+        log.info("{}", reader.use {
+            try {
+                log.info(Thread.currentThread().stackTrace.joinToString("\n\t"))
+                Integer.parseInt(it.readLine())
+            } catch (e: NumberFormatException) {
+                null
+            }
+        })
+    }
+
+    @Test
+    fun testTryAsExpression() {
+        log.info("try :{}", try {
+            Integer.parseInt(" ")
+        } catch (e: NumberFormatException) {
+            -1
+        })
+    }
+
+    @Test
+    fun testTryAsExpression1() {
+        fun readNumber(reader: BufferedReader) {
+            val number = try {
+                Integer.parseInt(reader.readLine())
+            } catch (e: NumberFormatException) {
+                return
+            }
+            println(number)
+        }
+
+        val reader = BufferedReader(StringReader("not a number"))
+        readNumber(reader)
+    }
 }
 
