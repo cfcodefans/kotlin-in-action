@@ -5,6 +5,7 @@ import ch03.Ch03Tests.Companion.log
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import probe
 import java.lang.StringBuilder
 
 class Ch03Tests {
@@ -95,7 +96,11 @@ class Ch03Tests {
 
     @Test
     fun testNoOverridingForExtensionFunctions1() {
-        fun View.showOff() = log.info("I'm a view!")
+        fun View.showOff() {
+            log.probe(5)
+            log.info("I'm a view!")
+        }
+
         fun Button.showOff() = log.info("I'm a button!")
         val view: View = Button()
         view.showOff()
@@ -110,6 +115,10 @@ open class View {
 }
 
 class Button : View() {
-    override fun click() = log.info("Button clicked")
+
+    override fun click() {
+        log.probe(5)
+        log.info("Button clicked")
+    }
 }
 
