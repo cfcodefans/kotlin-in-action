@@ -2,11 +2,14 @@ package ch03
 
 import ch02.Ch02Tests
 import ch03.Ch03Tests.Companion.log
+import org.junit.Assert
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import probe
 import java.lang.StringBuilder
+import java.time.DayOfWeek
+import java.time.temporal.WeekFields
 
 class Ch03Tests {
     companion object {
@@ -107,6 +110,98 @@ class Ch03Tests {
         (view as Button).showOff()
         val button: Button = Button()
         button.showOff()
+    }
+
+    val String.lastChar: Char
+        get() = this[this.length - 1]
+    var StringBuilder.lastChar: Char
+        get() = this[this.length - 1]
+        set(v: Char) {
+            this.setCharAt(length - 1, v)
+            log.probe()
+        }
+
+    @Test
+    fun testExtensionProp() {
+        log.info("Kotlin".lastChar.toString())
+        StringBuilder("Kotlin?").run {
+            log.probe()
+            this.lastChar = '!'
+            log.info(this.toString())
+        }
+    }
+
+    @Test
+    fun testExtensionMethod() {
+        fun String.isPalindrome(): Boolean = !(0..this.length / 2).any { it -> this[it] != this[this.length - 1 - it] }
+
+        Assert.assertTrue("ll".isPalindrome())
+        Assert.assertTrue("lol".isPalindrome())
+        Assert.assertFalse("kotlin".isPalindrome())
+    }
+
+    @Test
+    fun testVarargs() {
+        log.info("{}, {}, {}, {}, {}, {}, {}", DayOfWeek.values())
+        log.info("{}, {}, {}, {}, {}, {}, {}", *DayOfWeek.values())
+    }
+
+    @Test
+    fun testSplittingString() {
+        log.info("{}", "12.345-6.A".split("\\.|-"))
+        log.info("{}", "12.345-6.A".split("\\.|-".toRegex()))
+        log.info("{}", "12.345-6.A".split(".", "-"))
+    }
+
+    @Test
+    fun testParsePath() {
+        val path: String = "/Users/yole/kotlin-book/chapter.adoc"
+        val dir = path.substringBeforeLast("/")
+        val fullname = path.substringAfterLast("/")
+        val filename = path.substringBeforeLast(".")
+        val extension = path.substringAfterLast(".")
+
+        log.info("Dir:\t$dir, Name:\t$filename, Ext:\t$extension")
+    }
+
+    @Test
+    fun testMultilineTriplequote() {
+        val kotlinLogo = """ 
+                            | //
+                           .|//
+                           .|/ \"""
+        log.info(kotlinLogo.trimIndent())
+    }
+
+    @Test
+    fun testValidateUser() {
+        data class User(val id: Int, val name: String, val address: String)
+
+        fun saveUser(user: User) {
+            if (user.name.isEmpty()) throw IllegalArgumentException("Can't save user ${user.id}: empty name")
+            if (user.address.isEmpty()) throw IllegalArgumentException("Can't save user ${user.id}: empty Address")
+        }
+        try {
+            saveUser(User(1, "", ""))
+            Assert.fail()
+        } catch (e: Exception) {
+            log.error("expected", e)
+        }
+
+        fun validate(user: User, value: String, fieldName: String) {
+            if (value.isEmpty()) throw IllegalArgumentException("Can't save user ${user.id}: empty $fieldName")
+        }
+
+        fun User.validate() {
+            validate(this, this.name, "Name")
+            validate(this, this.address, "Address")
+        }
+        try {
+            User(1, "", "").validate()
+            Assert.fail()
+        } catch (e: Exception) {
+            log.error("expected", e)
+        }
     }
 }
 
