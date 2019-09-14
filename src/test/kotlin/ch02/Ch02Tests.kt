@@ -1,6 +1,7 @@
 package ch02
 
 import ch02.Ch02Tests.Companion.RGB.*
+import inspect
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -41,6 +42,14 @@ class Ch02Tests {
         interface Expr
         class Num(val value: Int) : Expr
         class Sum(val left: Expr, val right: Expr) : Expr
+
+        fun selfInspect() = log.inspect(this.javaClass)
+    }
+
+    @Test
+    fun testCompanionObject() {
+        selfInspect()
+        log.inspect(this.javaClass)
     }
 
     @Test
@@ -82,6 +91,7 @@ class Ch02Tests {
             val bob = Person("Bob", true)
             log.info(bob.name)
             log.info(bob.isMarried.toString())
+            log.inspect(Person::class.java)
         }
 //        log.info(bob.isMarried.toString())
         run {
@@ -106,6 +116,7 @@ class Ch02Tests {
 
         val rect = Rectangle(41, 43)
         log.info(rect.isSquare.toString())
+        log.inspect(Rectangle::class.java)
     }
 
     @Test
