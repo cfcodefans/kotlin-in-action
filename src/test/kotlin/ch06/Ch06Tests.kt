@@ -1,13 +1,16 @@
 package ch06
 
 import info
-import ch05.Ch05Tests
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import probe
+import java.io.BufferedReader
+import java.io.StringReader
 import java.util.*
+import kotlin.collections.ArrayList
 
 class Ch06Tests {
     companion object {
@@ -159,9 +162,65 @@ class Ch06Tests {
     @Test
     fun testNumberConversions() {
         val x = 1
+        log.info(x.toLong() in listOf(1L, 2L, 3L))
 
+        fun foo(l: Long) = l.toString(2)
+        val b: Byte = 15
+        val l = b + 0L
+        log.info(foo(l))
+
+//        log.info("  42 ".toInt())
+        log.info("  42 ".trim().toInt())
     }
 
+    @Test
+    fun testNothingType() {
+        fun fail(message: String): Nothing {
+            throw IllegalStateException(message)
+        }
+        fail("Error occurred")
+    }
+
+    @Test
+    fun testValidateNumbers() {
+        val reader = BufferedReader(StringReader("1\nabc\n42"))
+        val numbers: List<Int?> = reader.useLines {
+            val result = ArrayList<Int?>()
+            for (line in it) {
+                result.add(try {
+                    line.toInt()
+                } catch (e: NumberFormatException) {
+                    null
+                })
+            }
+            result
+        }
+
+        log.info("Sum of valid numbers: ${numbers.filterNotNull().sum()}")
+        log.info("invalid numbers: ${numbers.count { it == null }}")
+    }
+
+    @Test
+    fun testReadonlyAndMutableCollections() {
+        val src: Collection<Int> = arrayListOf(3, 5, 7)
+        val target: MutableCollection<Int> = arrayListOf(1)
+        src.forEach { target.add(it) }
+        log.info(target)
+    }
+
+    @Test
+    fun testArrays() {
+        run {
+            val array: Array<Int> = (1..10).toList().toTypedArray()
+            for (i in array.indices) {
+                log.info("element $i is: ${array[i]}")
+            }
+        }
+        run {
+            val letters: Array<String> = Array<String>(26) { i -> log.probe(4);('a' + i).toString() }
+            log.info(letters)
+        }
+    }
 }
 
 class Ch06Tests_LateinitialzedProps {
