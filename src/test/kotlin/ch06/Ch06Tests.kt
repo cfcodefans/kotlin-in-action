@@ -217,8 +217,17 @@ class Ch06Tests {
             }
         }
         run {
+            //TODO mysterious
             val letters: Array<String> = Array<String>(26) { i -> log.probe(4);('a' + i).toString() }
             log.info(letters)
+        }
+        run {
+            val strs = listOf("a", "b", "c")
+            log.info("%s/%s/%s".format(*strs.toTypedArray()))
+        }
+        run {
+            val squares = IntArray(5) { i: Int -> (i + 1) * (i + 1) }
+            log.info(squares.joinToString())
         }
     }
 }
