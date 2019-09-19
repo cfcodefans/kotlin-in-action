@@ -229,6 +229,10 @@ class Ch06Tests {
             val squares = IntArray(5) { i: Int -> (i + 1) * (i + 1) }
             log.info(squares.joinToString())
         }
+        run {
+            val array: Array<Int> = (1..10).toList().toTypedArray()
+            array.forEachIndexed { i, e -> log.info("array[$i] = $e") }
+        }
     }
 }
 
