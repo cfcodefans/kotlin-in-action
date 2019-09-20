@@ -1,7 +1,6 @@
 import org.slf4j.Logger
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
-import kotlin.reflect.KClass
 
 fun Logger.probe() {
     this.info(Thread.currentThread().stackTrace.joinToString("\n\t", "{", "}"))
@@ -23,7 +22,7 @@ fun <T : Any?> Class<T>.info(all: Boolean = false): String {
     else
         ""
 
-    val fieldsStr = cls.declaredFields
+    val fieldsStr = (if (all) cls.fields else cls.declaredFields)
             .map { " ${Modifier.toString(it.modifiers)} ${it.type.simpleName} ${it.name} " }
             .joinToString("\n\t", "\t//field start\n", "\n\t//field end\n")
 

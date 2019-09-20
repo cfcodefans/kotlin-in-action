@@ -13,6 +13,7 @@ import java.io.Serializable
 import java.util.*
 import java.util.concurrent.Executors
 import kotlin.Comparator
+import kotlin.collections.HashSet
 
 
 class Ch04Tests {
@@ -39,6 +40,12 @@ class Ch04Tests {
             }
         }
         Button().click()
+    }
+
+    @Test
+    fun testProp() {
+        class Person(val name: String, age: Int, salary: Int)
+        log.inspect(Person::class.java, true)
     }
 
     @Test
@@ -142,6 +149,7 @@ class Ch04Tests_2 {
             final override fun click() {}
         }
     }
+
 }
 
 class Ch04Tests_3 {
@@ -369,5 +377,29 @@ class Ch04Tests_Object {
         }
 
         log.info("final ${SomeSingleton.count}")
+    }
+}
+
+class Ch04_Tests_By {
+    companion object {
+        val log: Logger = LoggerFactory.getLogger(Ch04_Tests_By::class.java)
+
+        class CountingSet<T>(val innerSet: MutableSet<T> = HashSet<T>()) : MutableCollection<T> by innerSet {
+            var objectsAdded = 0
+            override fun add(element: T): Boolean {
+                objectsAdded++
+                return innerSet.add(element)
+            }
+
+            override fun addAll(c: Collection<T>): Boolean {
+                objectsAdded += c.size
+                return innerSet.addAll(c)
+            }
+        }
+    }
+
+    @Test
+    fun testByDelegation() {
+        log.inspect(CountingSet::class.java)
     }
 }
