@@ -47,4 +47,4 @@ fun <T : Any?> Logger.inspect(cls: Class<T>, all: Boolean = false) {
     this.info(cls.info(all))
 }
 
-fun Logger.info(v: Any?) = this.info("{}", v)
+fun Logger.info(vararg vs: Any?) = this.info("{}", vs)
