@@ -362,5 +362,24 @@ class Ch07_Tests_ImplementingDelegatedProperties {
         p.age = 35
         p.salary = 2100
     }
+
+    @Test
+    fun testExpandoObj() {
+        class Person {
+            private val _attrs = hashMapOf<String, String>()
+            fun setAttr(attrName: String, value: String) {
+                _attrs[attrName] = value
+            }
+
+            val name: String inline get() = _attrs["name"]!!
+            val company: String by _attrs
+        }
+
+        val p = Person()
+        val data = mapOf("name" to "Dmitry", "company" to "JetBrains")
+        for ((attrName, value) in data) p.setAttr(attrName, value)
+        log.info(p.name)
+        log.info(p.company)
+    }
 }
 
